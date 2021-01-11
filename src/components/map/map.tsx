@@ -43,9 +43,8 @@ function Map(props: MapProps): JSX.Element {
             maxBounds={mapOptions.maxBounds}
             whenCreated={(cgpMap) => {
                 // reset the view when created so overviewmap is moved at the right place
-                setTimeout(() => {
-                    cgpMap.setView(center, zoom);
-                }, 0);
+
+                cgpMap.setView(center, zoom);
 
                 // TODO: put this a t the right place. This is temporary to show we can add different layer type to the map
                 const layer = new Layer();
@@ -76,11 +75,11 @@ function Map(props: MapProps): JSX.Element {
     );
 }
 
-export function createMap(element: Element, config: MapConfig, i18nInstance: any): void {
+export function createMap(element: Element, config: MapConfig, i18nInstance: any): React.ReactNode {
     const center: LatLngTuple = [config.center[0], config.center[1]];
 
     // * strict mode rendering twice explanation: https://mariosfakiolas.com/blog/my-react-components-render-twice-and-drive-me-crazy/
-    render(
+    return (
         <StrictMode>
             <Suspense fallback="">
                 <I18nextProvider i18n={i18nInstance}>
@@ -94,8 +93,7 @@ export function createMap(element: Element, config: MapConfig, i18nInstance: any
                     />
                 </I18nextProvider>
             </Suspense>
-        </StrictMode>,
-        element
+        </StrictMode>
     );
 }
 
