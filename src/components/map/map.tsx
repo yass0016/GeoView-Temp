@@ -75,11 +75,11 @@ function Map(props: MapProps): JSX.Element {
     );
 }
 
-export function createMap(element: Element, config: MapConfig, i18nInstance: any): React.ReactNode {
+export function createMap(element: Element, config: MapConfig, i18nInstance: any): void {
     const center: LatLngTuple = [config.center[0], config.center[1]];
 
     // * strict mode rendering twice explanation: https://mariosfakiolas.com/blog/my-react-components-render-twice-and-drive-me-crazy/
-    return (
+    render(
         <StrictMode>
             <Suspense fallback="">
                 <I18nextProvider i18n={i18nInstance}>
@@ -93,7 +93,8 @@ export function createMap(element: Element, config: MapConfig, i18nInstance: any
                     />
                 </I18nextProvider>
             </Suspense>
-        </StrictMode>
+        </StrictMode>,
+        element
     );
 }
 

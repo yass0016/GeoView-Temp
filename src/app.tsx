@@ -27,6 +27,7 @@ const maps: Element[] = [...document.getElementsByClassName('llwp-map')];
 
 ReactDOM.render(
     <>
+        Hello
         {[...maps].map((map: Element) => {
             // get the inline configuration
             // TODO: get config from CGP API, script mapping API and inline HTML
@@ -37,8 +38,26 @@ ReactDOM.render(
                 lng: config.language,
                 fallbackLng: config.language,
             });
-            return createMap(map, config, i18nInstance);
+            createMap(map, config, i18nInstance);
         })}
     </>,
     document.getElementById('root')
 );
+
+// ReactDOM.render(
+//     <>
+//         {[...maps].map((map: Element) => {
+//             // get the inline configuration
+//             // TODO: get config from CGP API, script mapping API and inline HTML
+//             // expression is not null or undefined, use the non-null assertion operator ! to coerce away those types
+//             const config = JSON.parse(map.getAttribute('data-leaflet')!.replace(/'/g, '"'));
+
+//             const i18nInstance = i18n.cloneInstance({
+//                 lng: config.language,
+//                 fallbackLng: config.language,
+//             });
+//             return createMap(map, config, i18nInstance);
+//         })}
+//     </>,
+//     document.getElementById('root')
+// );
