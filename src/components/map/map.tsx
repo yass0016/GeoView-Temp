@@ -2,6 +2,9 @@
 import { Suspense, StrictMode } from 'react';
 import { render } from 'react-dom';
 
+import { PersistGate } from 'redux-persist/integration/react';
+import { Provider } from 'react-redux';
+
 import { i18n } from 'i18next';
 
 import { I18nextProvider } from 'react-i18next';
@@ -18,6 +21,8 @@ import { MousePosition } from '../mapctrl/mouse-position';
 import { OverviewMap } from '../mapctrl/overview-map';
 import { Appbar } from '../appbar/app-bar';
 import { NavBar } from '../navbar/nav-bar';
+
+import { store, persistor } from '../../redux';
 
 interface MapProps {
     id?: string;
@@ -80,7 +85,7 @@ function Map(props: MapProps): JSX.Element {
             <AttributionControl position="bottomleft" />
             <OverviewMap crs={crs} basemaps={basemaps} zoomFactor={mapOptions.zoomFactor} />
             <div className="leaflet-control cgp-appbar">
-                <Appbar id={id} />
+                <Appbar id={id || ''} />
             </div>
         </MapContainer>
     );
@@ -92,18 +97,22 @@ export function createMap(element: Element, config: MapProps, i18nInstance: i18n
     // * strict mode rendering twice explanation: https://mariosfakiolas.com/blog/my-react-components-render-twice-and-drive-me-crazy/
     render(
         <StrictMode>
-            <Suspense fallback="">
-                <I18nextProvider i18n={i18nInstance}>
-                    <Map
-                        id={element.id}
-                        center={center}
-                        zoom={config.zoom}
-                        projection={config.projection}
-                        language={config.language}
-                        layers={config.layers}
-                    />
-                </I18nextProvider>
-            </Suspense>
+            <Provider store={store}>
+                <PersistGate loading={null} persistor={persistor}>
+                    <Suspense fallback="">
+                        <I18nextProvider i18n={i18nInstance}>
+                            <Map
+                                id={element.id}
+                                center={center}
+                                zoom={config.zoom}
+                                projection={config.projection}
+                                language={config.language}
+                                layers={config.layers}
+                            />
+                        </I18nextProvider>
+                    </Suspense>
+                </PersistGate>
+            </Provider>
         </StrictMode>,
         element
     );

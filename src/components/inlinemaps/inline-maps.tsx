@@ -1,14 +1,11 @@
 import React, { useEffect } from 'react';
 
-import './assests/i18n/i18n';
+import '../../assests/i18n/i18n';
 import i18n from 'i18next';
 
-import { createMap } from './components/map/map';
+import { createMap } from '../map/map';
 
-/**
- * Inialize the app with maps from inline html configs, url params
- */
-const AppStart = (): JSX.Element => {
+const InlineMaps = (): JSX.Element => {
     /**
      * Create maps from inline configs with class name llwp-map in index.html
      */
@@ -39,4 +36,4 @@ const AppStart = (): JSX.Element => {
     return <></>;
 };
 
-export default AppStart;
+export default InlineMaps;
