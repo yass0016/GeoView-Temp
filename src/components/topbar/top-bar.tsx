@@ -8,7 +8,7 @@ interface StateProps {
 }
 
 const TopBar = (props: StateProps): JSX.Element => {
-    const { position } = props;
+    const { position, maps } = props;
 
     return (
         <div
@@ -23,6 +23,13 @@ const TopBar = (props: StateProps): JSX.Element => {
             }}
         >
             Lat: {position[0]} Long: {position[1]}
+            {Object.keys(maps).map((map) => {
+                return (
+                    <div>
+                        {map}: Lat: {maps[map].position[0]} Long: {maps[map].position[1]}
+                    </div>
+                );
+            })}
         </div>
     );
 };
@@ -30,6 +37,7 @@ const TopBar = (props: StateProps): JSX.Element => {
 const mapStateToProps = (state: AppState) => {
     return {
         position: state.common.position,
+        maps: state.common.maps,
     };
 };
 

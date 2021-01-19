@@ -7,17 +7,20 @@ import { LatLngTuple, Map } from 'leaflet';
 
 import { connect } from 'react-redux';
 
-import { setPosition } from '../../redux/common';
+import { setPosition, updateMapPosition } from '../../redux/common';
 import { AppState } from '../../redux';
 
 type MiniboundProps = {
+    id: string;
     parentMap: Map;
     zoomFactor: number;
     setPosition: (position: LatLngTuple) => void;
+    updateMapPosition: (id: string, position: LatLngTuple) => void;
+    maps: Record<string, unknown>;
 };
 
 const MinimapBounds = (props: MiniboundProps): JSX.Element => {
-    const { parentMap, zoomFactor } = props;
+    const { id, parentMap, zoomFactor } = props;
     const minimap = useMap();
 
     // Clicking a point on the minimap sets the parent's map center
@@ -43,6 +46,10 @@ const MinimapBounds = (props: MiniboundProps): JSX.Element => {
         minimap.flyTo(parentCenter, newZoom);
 
         props.setPosition([parentCenter.lat, parentCenter.lng]);
+
+        props.updateMapPosition(id, [parentCenter.lat, parentCenter.lng]);
+
+        console.log(props.maps);
 
         // Set in timeout the calculation to create the bound so parentMap getBounds has the updated bounds
         setTimeout(() => {
@@ -86,7 +93,8 @@ const MinimapBounds = (props: MiniboundProps): JSX.Element => {
 const mapStateToProps = (state: AppState) => {
     return {
         position: state.common.position,
+        maps: state.common.maps,
     };
 };
 
-export default connect(mapStateToProps, { setPosition })(MinimapBounds);
+export default connect(mapStateToProps, { setPosition, updateMapPosition })(MinimapBounds);

@@ -1,13 +1,7 @@
 /* eslint-disable react/require-default-props */
-import { Suspense, StrictMode } from 'react';
-import { render } from 'react-dom';
+import React, { useEffect } from 'react';
 
-import { PersistGate } from 'redux-persist/integration/react';
-import { Provider } from 'react-redux';
-
-import { i18n } from 'i18next';
-
-import { I18nextProvider } from 'react-i18next';
+import { connect } from 'react-redux';
 
 import { LatLngTuple, CRS } from 'leaflet';
 import { MapContainer, TileLayer, ScaleControl, AttributionControl } from 'react-leaflet';
@@ -22,18 +16,20 @@ import { OverviewMap } from '../mapctrl/overview-map';
 import { Appbar } from '../appbar/app-bar';
 import { NavBar } from '../navbar/nav-bar';
 
-import { store, persistor } from '../../redux';
+import { AppState } from '../../redux';
+import { addMap } from '../../redux/common';
 
-interface MapProps {
+type MapProps = {
     id?: string;
     center: LatLngTuple;
     zoom: number;
     projection: number;
     language: string;
     layers?: LayerConfig[];
-}
+    addMap?: (id: string) => void;
+};
 
-function Map(props: MapProps): JSX.Element {
+const Map = (props: MapProps): JSX.Element => {
     const { id, center, zoom, projection, language, layers } = props;
 
     // get the needed projection. Web Mercator is out of the box but we need to create LCC
@@ -47,6 +43,10 @@ function Map(props: MapProps): JSX.Element {
 
     // get map option from slected basemap projection
     const mapOptions: MapOptions = getMapOptions(projection);
+
+    useEffect(() => {
+        if (props.addMap) props.addMap(id || '');
+    }, []);
 
     return (
         <MapContainer
@@ -83,37 +83,20 @@ function Map(props: MapProps): JSX.Element {
             <MousePosition />
             <ScaleControl position="bottomright" imperial={false} />
             <AttributionControl position="bottomleft" />
-            <OverviewMap crs={crs} basemaps={basemaps} zoomFactor={mapOptions.zoomFactor} />
+            <OverviewMap id={id || ''} crs={crs} basemaps={basemaps} zoomFactor={mapOptions.zoomFactor} />
             <div className="leaflet-control cgp-appbar">
                 <Appbar id={id || ''} />
             </div>
         </MapContainer>
     );
-}
+};
 
-export function createMap(element: Element, config: MapProps, i18nInstance: i18n): void {
-    const center: LatLngTuple = [config.center[0], config.center[1]];
+const mapStateToProps = (state: AppState) => {
+    return {
+        maps: state.common.maps,
+    };
+};
 
-    // * strict mode rendering twice explanation: https://mariosfakiolas.com/blog/my-react-components-render-twice-and-drive-me-crazy/
-    render(
-        <StrictMode>
-            <Provider store={store}>
-                <PersistGate loading={null} persistor={persistor}>
-                    <Suspense fallback="">
-                        <I18nextProvider i18n={i18nInstance}>
-                            <Map
-                                id={element.id}
-                                center={center}
-                                zoom={config.zoom}
-                                projection={config.projection}
-                                language={config.language}
-                                layers={config.layers}
-                            />
-                        </I18nextProvider>
-                    </Suspense>
-                </PersistGate>
-            </Provider>
-        </StrictMode>,
-        element
-    );
-}
+export default connect(mapStateToProps, {
+    addMap,
+})(Map);

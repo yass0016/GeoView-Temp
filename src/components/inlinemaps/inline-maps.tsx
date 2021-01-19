@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import '../../assests/i18n/i18n';
 import i18n from 'i18next';
 
-import { createMap } from '../map/map';
+import { createMap } from '../map/create-map';
 
 const InlineMaps = (): JSX.Element => {
     /**

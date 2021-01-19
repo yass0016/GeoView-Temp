@@ -10,13 +10,14 @@ import { LEAFLET_POSITION_CLASSES } from '../../common/constant';
 import MinimapBounds from './minimap-bounds';
 
 interface OverviewProps {
+    id: string;
     crs: CRS;
     basemaps: BasemapOptions[];
     zoomFactor: number;
 }
 
 export function OverviewMap(props: OverviewProps): JSX.Element {
-    const { crs, basemaps, zoomFactor } = props;
+    const { id, crs, basemaps, zoomFactor } = props;
 
     const parentMap = useMap();
     const mapZoom = parentMap.getZoom() - zoomFactor > 0 ? parentMap.getZoom() - zoomFactor : 0;
@@ -42,7 +43,7 @@ export function OverviewMap(props: OverviewProps): JSX.Element {
                 {basemaps.map((base: { id: string | number | null | undefined; url: string }) => (
                     <TileLayer key={base.id} url={base.url} />
                 ))}
-                <MinimapBounds parentMap={parentMap} zoomFactor={zoomFactor} />
+                <MinimapBounds id={id} parentMap={parentMap} zoomFactor={zoomFactor} />
             </MapContainer>
         ),
         [parentMap, crs, mapZoom, basemaps, zoomFactor]
