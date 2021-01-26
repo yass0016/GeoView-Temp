@@ -26,11 +26,11 @@
             { 'url': 'https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCC/Geochronology/MapServer', 'type': 'esriDynamic', 'entries': '0' }
         ]}"></div><p>Cette carte est un exemple d'une carte créée à partir de Leaflet et React. La projection LCC est utilisée et l'interface est en français.</p><div class="panel"><h3>Accessing map center from outside of the core viewer using api event listeners</h3><div class="maps-position"></div></div></div><script>const mapsPosition = document.getElementsByClassName('maps-position');
 
-            // initialize app and api events
-            app.init();
+            // initialize cgpv and api events
+            cgpv.init();
 
             // listen to an event emitted by mapWM
-            app.api.on(
+            cgpv.api.on(
                 'map/moveend',
                 (args) => {
                     console.log(args);
@@ -39,7 +39,7 @@
             );
 
             // listen to all events emitted with same event name
-            app.api.all('map/moveend', (args) => {
+            cgpv.api.all('map/moveend', (args) => {
                 mapsPosition[0].innerHTML = mapsPosition[1].innerHTML = args
                     .map((map) => {
                         return `<p>Map ${map.handlerName} with latitude ${map.position.lat} and longitude ${map.position.lng}</p>`;
