@@ -29,7 +29,16 @@
             // initialize app and api events
             app.init();
 
-            // listen to an event
+            // listen to an event emitted by mapWM
+            app.api.on(
+                'map/moveend',
+                (args) => {
+                    console.log(args);
+                },
+                'mapWM'
+            );
+
+            // listen to all events emitted with same event name
             app.api.all('map/moveend', (args) => {
                 mapsPosition[0].innerHTML = mapsPosition[1].innerHTML = args
                     .map((map) => {
