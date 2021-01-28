@@ -50,9 +50,15 @@
                     .join(' ');
             });
 
+            // find the button element by ID
             var addGeoJSONButton = document.getElementById('add-geojson');
+
+            // add an event listener when a button is clicked
             addGeoJSONButton.addEventListener('click', function (e) {
-                cgpv.api.emit('geojson/add', null, {
+                // emit a new event to a geojson layer from url
+                // adding a geojson layer requires a type of geojson and url
+                cgpv.api.emit('layer/add', null, {
+                    type: 'geojson',
                     url: 'https://raw.githubusercontent.com/fgpv-vpgf/contributed-plugins/master/chart/src/samples/geoJSON/pieChart.json',
                 });
             });</script></body></html>
