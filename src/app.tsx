@@ -1,12 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import proj4 from 'proj4';
+
 // Leaflet icons import to solve issues 4968
 import { Icon, Marker } from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
-import api from './api/api';
+import { api } from './api/api';
 
 import '../node_modules/leaflet/dist/leaflet.css';
 import '../public/css/style.css';
@@ -35,7 +37,11 @@ function init() {
 // cgpv object to be exported with the api for outside use
 const cgpv = {
     init,
-    api,
+    api: {
+        ...api,
+        ...api.event,
+        ...api.projection,
+    },
 };
 
 // freeze variable name so a variable with same name can't be defined from outside
