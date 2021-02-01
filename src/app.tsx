@@ -1,8 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import proj4 from 'proj4';
-
 // Leaflet icons import to solve issues 4968
 import { Icon, Marker } from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
