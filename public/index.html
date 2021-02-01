@@ -30,11 +30,24 @@
                 padding: 10px;
                 font-size: 12px;
             }
+
+            .toolbar {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                width: 100%;
+                margin: 10px;
+            }
         </style>
     </head>
     <body>
         <div>
             <h3>The Atlas of Canada - Clean Energy Resources and Projects (CERP)</h3>
+            <div class="toolbar">
+                <button class="add-polyline-btn">Add Polyline</button>
+                <button class="add-polygon-btn">Add Polygon</button>
+                <button class="add-circle-btn">Add Circle</button>
+            </div>
             <div
                 id="mapWM"
                 class="llwp-map"
@@ -61,6 +74,11 @@
         <hr />
         <div>
             <h3>L'Atlas du Canada - Ressources et projets d'énergie propre (RPEP)</h3>
+            <div class="toolbar">
+                <button class="add-polyline-btn">Add Polyline</button>
+                <button class="add-polygon-btn">Add Polygon</button>
+                <button class="add-circle-btn">Add Circle</button>
+            </div>
             <div
                 id="mapLCC"
                 class="llwp-map"
@@ -120,6 +138,34 @@
                 cgpv.api.emit('layer/add', null, {
                     type: 'geoJSON',
                     url: 'https://raw.githubusercontent.com/fgpv-vpgf/contributed-plugins/master/chart/src/samples/geoJSON/pieChart.json',
+                });
+            });
+
+            // get addPolyline button element for WM map
+            var addPolylineBtn = document.getElementsByClassName('add-polyline-btn')[0];
+
+            // add polyline btn click event handler
+            addPolylineBtn.addEventListener('click', function (e) {
+                // call an api function to draw a polyline
+                cgpv.api.map('mapWM').addPolyline([45, -100], [50, -105], {
+                    stroke: true,
+                    color: '#000',
+                    weight: 5,
+                    opacity: '0.8',
+                });
+            });
+
+            // get addPolyline button element for LCC map
+            addPolylineBtn = document.getElementsByClassName('add-polyline-btn')[1];
+
+            // add polyline btn click event handler
+            addPolylineBtn.addEventListener('click', function (e) {
+                // call an api function to draw a polyline
+                cgpv.api.map('mapLCC').addPolyline([45, -100], [50, -105], {
+                    stroke: true,
+                    color: '#000',
+                    weight: 5,
+                    opacity: '0.8',
                 });
             });
         </script>
