@@ -19,7 +19,7 @@
                 justify-content: center;
                 width: 100%;
                 margin: 10px;
-            }</style><script src="gcpv-main.js"></script></head><body><div><h3>The Atlas of Canada - Clean Energy Resources and Projects (CERP)</h3><div class="toolbar"><button class="add-polyline-btn">Add Polyline</button> <button class="draw-polyline-btn">Draw Polyline</button> <button class="draw-polygon-btn">Draw Polygon</button> <button class="draw-circle-btn">Draw Circle</button> <button class="draw-rectangle-btn">Draw Rectangle</button></div><div id="mapWM" class="llwp-map" data-leaflet="{ 'name': 'Web Mercator', 'projection': 3857, 'zoom': 4, 'center': [60,-100], 'language': 'en-CA',
+            }</style><script src="gcpv-main.js"></script></head><body><div><h3>The Atlas of Canada - Clean Energy Resources and Projects (CERP)</h3><div class="toolbar"><button class="add-polyline-btn">Add Polyline</button> <button class="add-polygon-btn">Add Polygon</button> <button class="add-circle-btn">Add Circle</button> <button class="delete-polyline-btn">Delete Polyline</button> <button class="delete-group-btn">Delete Geometry</button></div><div id="mapWM" class="llwp-map" data-leaflet="{ 'name': 'Web Mercator', 'projection': 3857, 'zoom': 4, 'center': [60,-100], 'language': 'en-CA',
         'layers':[
             { 'url': 'https://webservices.maps.canada.ca/arcgis/services/StatCan/census_subdivisions_2016_en/MapServer/WMSServer', 'type': 'ogcWMS', 'entries': '0' },
             { 'url': 'https://geoappext.nrcan.gc.ca/arcgis/rest/services/NRCAN/Investing_Energy_Canada_en/MapServer', 'type': 'esriDynamic', 'entries': '0, 2' },
@@ -28,7 +28,7 @@
             { 'url': './geojson/points.json', 'type': 'geoJSON' },
             { 'url': './geojson/polygons.json', 'type': 'geoJSON' },
             { 'url': 'https://geo.weather.gc.ca/geomet', 'type': 'ogcWMS', 'entries': 'RAQDPS-FW.CE_PM2.5-DIFF-YAvg' }
-        ]}"></div><p>This map is an example of a Leaflet map done with React. This map is in Web Mercator projection with an English interface.</p><div class="panel"><h3>Accessing map center from outside of the core viewer using api event listeners</h3><div class="maps-position"></div></div><button id="add-geojson">Add GeoJSON Layer</button></div><hr/><div><h3>L'Atlas du Canada - Ressources et projets d'énergie propre (RPEP)</h3><div class="toolbar"><button class="add-polyline-btn">Add Polyline</button> <button class="draw-polyline-btn">Draw Polyline</button> <button class="draw-polygon-btn">Draw Polygon</button> <button class="draw-circle-btn">Draw Circle</button> <button class="draw-rectangle-btn">Draw Rectangle</button></div><div id="mapLCC" class="llwp-map" data-leaflet="{ 'name': 'LCC', 'projection': 3978, 'zoom': 12, 'center': [45,-75], 'language': 'fr-CA',
+        ]}"></div><p>This map is an example of a Leaflet map done with React. This map is in Web Mercator projection with an English interface.</p><div class="panel"><h3>Accessing map center from outside of the core viewer using api event listeners</h3><div class="maps-position"></div></div><button id="add-geojson">Add GeoJSON Layer</button></div><hr/><div><h3>L'Atlas du Canada - Ressources et projets d'énergie propre (RPEP)</h3><div class="toolbar"><button class="add-polyline-btn">Add Polyline</button> <button class="add-polygon-btn">Add Polygon</button> <button class="add-circle-btn">Add Circle</button></div><div id="mapLCC" class="llwp-map" data-leaflet="{ 'name': 'LCC', 'projection': 3978, 'zoom': 12, 'center': [45,-75], 'language': 'fr-CA',
         'layers':[
             { 'url': 'https://webservices.maps.canada.ca/arcgis/services/StatCan/census_subdivisions_2016_en/MapServer/WMSServer', 'type': 'ogcWMS', 'entries': '0' },
             { 'url': 'https://geoappext.nrcan.gc.ca/arcgis/services/MMS/T100EP_E/MapServer/WMSServer', 'type': 'ogcWMS', 'entries': '0' },
@@ -38,7 +38,7 @@
             { 'url': './geojson/points.json', 'type': 'geoJSON' },
             { 'url': './geojson/polygons.json', 'type': 'geoJSON' },
             { 'url': 'https://geoappext.nrcan.gc.ca/arcgis/rest/services/GSCC/Geochronology/MapServer', 'type': 'esriDynamic', 'entries': '0' }
-        ]}"></div><p>Cette carte est un exemple d'une carte créée à partir de Leaflet et React. La projection LCC est utilisée et l'interface est en français.</p><div class="panel"><h3>Accessing map center from outside of the core viewer using api event listeners</h3><div class="maps-position"></div></div></div><script>const mapsPosition = document.getElementsByClassName('maps-position');
+        ]}"></div><p>Cette carte est un exemple d'une carte créée à partir de Leaflet et React. La projection LCC est utilisée et l'interface est en français.</p><div class="panel"><h3>Accessing map center from outside of the core viewer using api event listeners</h3><div class="maps-position"></div></div><button id="add-geojson-lcc">Add GeoJSON Layer</button></div><script>const mapsPosition = document.getElementsByClassName('maps-position');
 
             // initialize cgpv and api events
             cgpv.init();
@@ -74,34 +74,114 @@
                 });
             });
 
+            // find the button element to add a geojson on an LCC map
+            var addGeoJSONButtonLCC = document.getElementById('add-geojson-lcc');
+
+            // add an event listener when the button is clicked
+            addGeoJSONButtonLCC.addEventListener('click', function (e) {
+                // add geojson to the lcc map
+                cgpv.api.emit('layer/add', null, {
+                    type: 'geoJSON',
+                    url: 'https://raw.githubusercontent.com/fgpv-vpgf/contributed-plugins/master/chart/src/samples/geoJSON/pieChart.json',
+                });
+            });
+
+            // used to store the created polyline geometry
+            var polyline = null;
+
             // get addPolyline button element for WM map
             var addPolylineBtn = document.getElementsByClassName('add-polyline-btn')[0];
 
-            // get drawPolyline button element for WM map
-            var drawPolylineBtn = document.getElementsByClassName('draw-polyline-btn')[0];
-
             // add polyline btn click event handler
             addPolylineBtn.addEventListener('click', function (e) {
+                // check if a group already exists
+                if (!cgpv.api.map('mapWM').getGeometryGroup('myGroup')) {
+                    cgpv.api.map('mapWM').createGeometryGroup('myGroup');
+                }
+
                 // call an api function to draw a polyline
-                cgpv.api.map('mapWM').addPolyline([45, -100], [50, -105], {
+                polyline = cgpv.api.map('mapWM').addPolyline([45, -100], [50, -105], {
                     stroke: true,
                     color: '#000',
                     weight: 5,
                     opacity: '0.8',
                 });
+
+                cgpv.api.map('mapWM').addToGeometryGroup('myGroup', polyline);
             });
 
-            // draw polyline btn click event handler
-            drawPolylineBtn.addEventListener('click', function (e) {
-                // enable mouse drawing for polyline
-                cgpv.api.map('mapWM').draw('polyline');
+            // get addPolygon button element for WM map
+            var addPolygonBtn = document.getElementsByClassName('add-polygon-btn')[0];
+
+            // add polygon btn click event handler
+            addPolygonBtn.addEventListener('click', function (e) {
+                // check if a group already exists
+                if (!cgpv.api.map('mapWM').getGeometryGroup('myGroup')) {
+                    cgpv.api.map('mapWM').createGeometryGroup('myGroup');
+                }
+
+                // call an api function to draw a polygon
+                const polygon = cgpv.api.map('mapWM').addPolygon(
+                    [
+                        [50, -109.05],
+                        [54, -109.03],
+                        [54, -102.05],
+                        [50, -102.04],
+                    ],
+                    {
+                        stroke: true,
+                        color: '#000',
+                        weight: 5,
+                        opacity: '0.8',
+                    }
+                );
+
+                cgpv.api.map('mapWM').addToGeometryGroup('myGroup', polygon);
+            });
+
+            // get addCircle button element for WM map
+            var addCircleBtn = document.getElementsByClassName('add-circle-btn')[0];
+
+            // add circle btn click event handler
+            addCircleBtn.addEventListener('click', function (e) {
+                // check if a group already exists
+                if (!cgpv.api.map('mapWM').getGeometryGroup('myGroup')) {
+                    cgpv.api.map('mapWM').createGeometryGroup('myGroup');
+                }
+
+                // call an api function to draw a polygon
+                const circle = cgpv.api.map('mapWM').addCircle(50, -109, 200, {
+                    color: 'red',
+                    fillColor: '#f03',
+                    fillOpacity: 0.5,
+                    radius: 50.0,
+                });
+
+                console.log(circle);
+
+                cgpv.api.map('mapWM').addToGeometryGroup('myGroup', circle);
+            });
+
+            // get deletePolyline button element for WM map
+            var deletePolylineBtn = document.getElementsByClassName('delete-polyline-btn')[0];
+
+            // add polyline btn click event handler
+            deletePolylineBtn.addEventListener('click', function (e) {
+                // call an api function to draw a polyline
+                cgpv.api.map('mapWM').deleteGeometry(polyline.id);
+            });
+
+            // get deleteGeomtryGroup button element for WM map
+            var deleteGeomtryGroup = document.getElementsByClassName('delete-group-btn')[0];
+
+            // add polyline btn click event handler
+            deleteGeomtryGroup.addEventListener('click', function (e) {
+                // call an api function to draw a polyline
+                cgpv.api.map('mapWM').deleteGeometryGroup('myGroup');
             });
 
             // get addPolyline button element for LCC map
             addPolylineBtn = document.getElementsByClassName('add-polyline-btn')[1];
-
-            // get drawPolyline button element for WM map
-            drawPolylineBtn = document.getElementsByClassName('draw-polyline-btn')[1];
 
             // add polyline btn click event handler
             addPolylineBtn.addEventListener('click', function (e) {
@@ -112,10 +192,4 @@
                     weight: 5,
                     opacity: '0.8',
                 });
-            });
-
-            // draw polyline btn click event handler
-            drawPolylineBtn.addEventListener('click', function (e) {
-                // enable mouse drawing for polyline for mapLCC
-                cgpv.api.map('mapLCC').draw('polyline');
             });</script></body></html>
