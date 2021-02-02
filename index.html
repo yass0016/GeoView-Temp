@@ -100,12 +100,18 @@
                 }
 
                 // call an api function to draw a polyline
-                polyline = cgpv.api.map('mapWM').addPolyline([45, -100], [50, -105], {
-                    stroke: true,
-                    color: '#000',
-                    weight: 5,
-                    opacity: '0.8',
-                });
+                polyline = cgpv.api.map('mapWM').addPolyline(
+                    [
+                        [45, -100],
+                        [50, -105],
+                    ],
+                    {
+                        stroke: true,
+                        color: '#000',
+                        weight: 5,
+                        opacity: '0.8',
+                    }
+                );
 
                 cgpv.api.map('mapWM').addToGeometryGroup('myGroup', polyline);
             });
@@ -183,13 +189,26 @@
 
             // add polyline btn click event handler
             addPolylineBtn.addEventListener('click', function (e) {
+                // check if a group already exists
+                if (!cgpv.api.map('mapLCC').getGeometryGroup('myGroup')) {
+                    cgpv.api.map('mapLCC').createGeometryGroup('myGroup');
+                }
+
                 // call an api function to draw a polyline
-                cgpv.api.map('mapLCC').addPolyline([45, -100], [50, -105], {
-                    stroke: true,
-                    color: '#000',
-                    weight: 5,
-                    opacity: '0.8',
-                });
+                const polyline = cgpv.api.map('mapLCC').addPolyline(
+                    [
+                        [45, -100],
+                        [50, -105],
+                    ],
+                    {
+                        stroke: true,
+                        color: '#000',
+                        weight: 5,
+                        opacity: '0.8',
+                    }
+                );
+
+                cgpv.api.map('mapLCC').addToGeometryGroup('myGroup', polyline);
             });
 
             // get addPolygon button element for LCC map
