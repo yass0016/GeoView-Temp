@@ -19,7 +19,7 @@
                 justify-content: center;
                 width: 100%;
                 margin: 10px;
-            }</style><script src="gcpv-main.js"></script></head><body><div><h3>The Atlas of Canada - Clean Energy Resources and Projects (CERP)</h3><div class="toolbar"><button class="add-polyline-btn">Add Polyline</button> <button class="add-polygon-btn">Add Polygon</button> <button class="add-circle-btn">Add Circle</button> <button class="delete-polyline-btn">Delete Polyline</button> <button class="delete-group-btn">Delete Group</button></div><div id="mapWM" class="llwp-map" data-leaflet="{ 'name': 'Web Mercator', 'projection': 3857, 'zoom': 4, 'center': [60,-100], 'language': 'en-CA',
+            }</style><script src="gcpv-main.js"></script></head><body><div><h3>The Atlas of Canada - Clean Energy Resources and Projects (CERP)</h3><div class="toolbar"><button class="add-polyline-btn">Add Polyline</button> <button class="add-polygon-btn">Add Polygon</button> <button class="add-circle-btn">Add Circle</button> <button class="add-circle-marker-btn">Add Circle Marker</button> <button class="delete-polyline-btn">Delete Polyline</button> <button class="delete-group-btn">Delete Group</button></div><div id="mapWM" class="llwp-map" data-leaflet="{ 'name': 'Web Mercator', 'projection': 3857, 'zoom': 4, 'center': [60,-100], 'language': 'en-CA',
         'layers':[
             { 'url': 'https://webservices.maps.canada.ca/arcgis/services/StatCan/census_subdivisions_2016_en/MapServer/WMSServer', 'type': 'ogcWMS', 'entries': '0' },
             { 'url': 'https://geoappext.nrcan.gc.ca/arcgis/rest/services/NRCAN/Investing_Energy_Canada_en/MapServer', 'type': 'esriDynamic', 'entries': '0, 2' },
@@ -164,6 +164,27 @@
                 });
 
                 cgpv.api.map('mapWM').addToGeometryGroup('myGroup', circle);
+            });
+
+            // get add circle marker button element for WM map
+            var addCircleMarkerBtn = document.getElementsByClassName('add-circle-marker-btn')[0];
+
+            // add circle marker btn click event handler
+            addCircleMarkerBtn.addEventListener('click', function (e) {
+                // check if a group already exists
+                if (!cgpv.api.map('mapWM').getGeometryGroup('myGroup')) {
+                    cgpv.api.map('mapWM').createGeometryGroup('myGroup');
+                }
+
+                // call an api function to draw a polygon
+                const circleMarker = cgpv.api.map('mapWM').addCircleMarker(70, -109, 5, {
+                    color: 'red',
+                    fillColor: '#f03',
+                    fillOpacity: 0.5,
+                    radius: 50.0,
+                });
+
+                cgpv.api.map('mapWM').addToGeometryGroup('myGroup', circleMarker);
             });
 
             // get deletePolyline button element for WM map
