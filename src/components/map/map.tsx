@@ -41,7 +41,7 @@ interface MapProps {
     layers?: LayerConfig[];
 }
 
-function Map(props: MapProps): JSX.Element {
+export function Map(props: MapProps): JSX.Element {
     const { id, center, zoom, projection, language, layers } = props;
 
     const defaultTheme = useTheme();

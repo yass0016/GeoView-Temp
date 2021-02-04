@@ -1,48 +1,91 @@
-import React, { useEffect } from 'react';
+/* eslint-disable @typescript-eslint/no-var-requires */
+import React, { Suspense } from 'react';
+
+import { LatLngTuple } from 'leaflet';
 
 import '../assests/i18n/i18n';
+
 import i18n from 'i18next';
+import { I18nextProvider } from 'react-i18next';
 
 import { ThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
-import { createMap } from '../components/map/map';
+import { Map } from '../components/map/map';
 import { theme } from '../assests/style/theme';
+
+const HtmlToReact = require('html-to-react');
+const HtmlToReactParser = require('html-to-react').Parser;
+
+interface AppStartProps {
+    html: string;
+}
 
 /**
  * Inialize the app with maps from inline html configs, url params
  */
-const AppStart = (): JSX.Element => {
+const AppStart = (props: AppStartProps): JSX.Element => {
+    const { html } = props;
+
     /**
      * Create maps from inline configs with class name llwp-map in index.html
      */
     function getInlineMaps() {
-        // get map configurations from inline data
-        const maps: Element[] = [...document.getElementsByClassName('llwp-map')];
+        const isValidNode = () => {
+            return true;
+        };
 
-        // loop through all the maps and create an app for it.
-        return [...maps].forEach((map: Element) => {
-            // get the inline configuration
-            const config = JSON.parse((map.getAttribute('data-leaflet') || '')?.replace(/'/g, '"'));
+        // Order matters. Instructions are processed in the order they're defined
+        const processNodeDefinitions = new HtmlToReact.ProcessNodeDefinitions(React);
+        const processingInstructions = [
+            {
+                // Custom <h1> processing
+                shouldProcessNode: (node) => {
+                    return node.attribs && node.attribs.class && node.attribs.class === 'llwp-map';
+                },
+                processNode: (node, children) => {
+                    const config = JSON.parse((node.attribs['data-leaflet'] || '')?.replace(/'/g, '"'));
 
-            const i18nInstance = i18n.cloneInstance({
-                lng: config.language,
-                fallbackLng: config.language,
-            });
+                    const i18nInstance = i18n.cloneInstance({
+                        lng: config.language,
+                        fallbackLng: config.language,
+                    });
 
-            // create the map and render it within it's own div
-            createMap(map, config, i18nInstance);
-        });
+                    const center: LatLngTuple = [config.center[0], config.center[1]];
+
+                    return (
+                        <I18nextProvider i18n={i18nInstance}>
+                            <Map
+                                id={node.attribs.id}
+                                center={center}
+                                zoom={config.zoom}
+                                projection={config.projection}
+                                language={config.language}
+                                layers={config.layers}
+                            />
+                        </I18nextProvider>
+                    );
+                },
+            },
+            {
+                // Anything else
+                shouldProcessNode: (node) => {
+                    return true;
+                },
+                processNode: processNodeDefinitions.processDefaultNode,
+            },
+        ];
+
+        const htmlToReactParser = new HtmlToReactParser();
+        return htmlToReactParser.parseWithInstructions(html, isValidNode, processingInstructions);
     }
-
-    useEffect(() => {
-        // get map configurations from html divs in index.html and render them
-        getInlineMaps();
-    }, []);
 
     return (
         <ThemeProvider theme={theme}>
-            <CssBaseline />
+            <Suspense fallback="">
+                <CssBaseline />
+                {getInlineMaps()}
+            </Suspense>
         </ThemeProvider>
     );
 };
