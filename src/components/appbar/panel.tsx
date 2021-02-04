@@ -1,5 +1,7 @@
 import { useRef, useEffect } from 'react';
 
+import { useMap } from 'react-leaflet';
+
 import { useTranslation } from 'react-i18next';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -7,10 +9,14 @@ import { Card, CardHeader, CardContent, Divider, IconButton } from '@material-ui
 import CloseIcon from '@material-ui/icons/Close';
 
 import { DomEvent } from 'leaflet';
+import { api } from '../../api/api';
+import { EVENT_NAMES } from '../../api/event';
+import { PanelType } from '../../common/panel';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        maxWidth: 300,
+        maxWidth: 500,
+        minWidth: 200,
         height: '100%',
         marginLeft: theme.spacing(2),
         borderRadius: 0,
@@ -22,37 +28,45 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function PanelApp(props: PanelAppProps): JSX.Element {
-    const { title, icon, content, closeDrawer } = props;
+    const { panel } = props;
+
     const classes = useStyles(props);
     const { t } = useTranslation();
 
-    const panel = useRef();
+    const map = useMap();
+
+    const mapId = api.mapInstance(map).id;
+
+    const panelRef = useRef();
     useEffect(() => {
         // disable events on container
-        DomEvent.disableClickPropagation((panel.current as unknown) as HTMLElement);
-        DomEvent.disableScrollPropagation((panel.current as unknown) as HTMLElement);
+        DomEvent.disableClickPropagation((panelRef.current as unknown) as HTMLElement);
+        DomEvent.disableScrollPropagation((panelRef.current as unknown) as HTMLElement);
     }, []);
 
-    useEffect(() => {
-        // TODO: first draf to open close the custom appbar pnael component. Make this cleaner
-        if (typeof panel.current !== 'undefined') {
-            panel.current.parentElement.style.display = 'block';
-
-            // close drawer when panel opens
-            closeDrawer();
-        }
-    });
-
     function closePanel(): void {
-        panel.current.parentElement.style.display = 'none';
+        api.event.emit(EVENT_NAMES.EVENT_PANEL_OPEN_CLOSE, mapId, {
+            // used when checking which panel was closed from which map
+            handlerId: mapId,
+            // status of panel (false = closed)
+            status: false,
+        });
     }
 
     return (
-        <Card className={classes.root} ref={panel}>
+        <Card
+            className={classes.root}
+            ref={panelRef}
+            style={{
+                width: panel.panelWidth,
+            }}
+        >
             <CardHeader
                 className={classes.avatar}
-                avatar={icon}
-                title={t(title)}
+                avatar={
+                    typeof panel.panelIcon === 'string' ? <div dangerouslySetInnerHTML={{ __html: panel.panelIcon }} /> : panel.panelIcon
+                }
+                title={t(panel.panelTitle)}
                 action={
                     <IconButton aria-label={t('appbar.close')} onClick={closePanel}>
                         <CloseIcon />
@@ -60,15 +74,17 @@ export default function PanelApp(props: PanelAppProps): JSX.Element {
                 }
             />
             <Divider />
-            <CardContent>{content}</CardContent>
+            <CardContent>
+                {typeof panel.panelContent === 'string' ? (
+                    <div dangerouslySetInnerHTML={{ __html: panel.panelContent }} />
+                ) : (
+                    panel.panelContent
+                )}
+            </CardContent>
         </Card>
     );
 }
 
 interface PanelAppProps {
-    title: string;
-    // eslint-disable-next-line react/require-default-props
-    icon?: React.ReactNode;
-    content: Element;
-    closeDrawer: () => void;
+    panel: PanelType;
 }
